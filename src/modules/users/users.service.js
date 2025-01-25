@@ -1,7 +1,7 @@
 import { asyncHandler, TKN } from "../../utils/index.js";
-import userModel, { roleEnum } from "./../../db/models/user.model.js";
+import userModel from "./../../db/models/user.model.js";
 import { HSH, EN } from "../../utils/index.js";
-import { eventEmitter } from "../../middleware/sendEmailEvent.js";
+import { eventEmitter } from "./../../middleware/index.js";
 // ------------------SIGNUP--------------------------
 export const signup = asyncHandler(async (req, res, next) => {
   const { name, email, phone, password } = req.body;
@@ -12,12 +12,20 @@ export const signup = asyncHandler(async (req, res, next) => {
     password: await HSH.hashData(password),
   });
   eventEmitter.emit("sendOtp", email, 5);
-  res
-    .status(200)
-    .json({
-      msg: "success",
-      user: { name: user.name, email: user.email, confirmed: user.confirmed },
-    });
+  res.status(200).json({
+    msg: "success",
+    user: { name: user.name, email: user.email, confirmed: user.confirmed },
+  });
+});
+// -----------------SOCIAL-SIGNUP------------------------
+export const socialSignup = asyncHandler(async (req, res, next) => {
+  const user = await userModel.create({
+    name: req.data.name,
+    email: req.data.email,
+    confirmed: req.data.isVerified,
+    googleId: req.data.userid,
+  });
+  res.status(201).json({msg : 'success', user})
 });
 // ------------------CONFIRM-EMAIL-----------------------
 export const confirmEmail = asyncHandler(async (req, res, next) => {
@@ -38,16 +46,18 @@ export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await userModel.findOne({ email: email });
   if (!user) {
+    return next(new Error("profile not found.", { cause: 404 }));
+  }
+  if (user.isFreezed || !user.confirmed) {
+    return next(new Error("please re/activate your profile.", { cause: 401 }));
+  }
+  if (user.failedAttempts > 4) {
+    await userModel.updateOne({ _id: user._id }, { isFreezed: true });
     return next(
-      new Error("profile not found.", { cause: 404 })
+      new Error("maximum attempts reached. please reset password.", {
+        cause: 401,
+      })
     );
-  }
-  if(user.isFreezed || !user.confirmed){
-    return next(new Error("please re/activate your profile.", {cause : 401}))
-  }
-  if(user.failedAttempts > 4){
-    await userModel.updateOne({_id : user._id}, {isFreezed : true})
-    return next(new Error("maximum attempts reached. please reset password.", {cause : 401}))
   }
   if (!(await HSH.hashCompare(user.password, password))) {
     await userModel.updateOne(
@@ -67,6 +77,19 @@ export const login = asyncHandler(async (req, res, next) => {
       lastFailedAttempt: null,
     }
   );
+  res.status(200).json({ msg: "success", accessToken, refreshToken });
+});
+// -----------------SOCIAL-LOGIN------------------------------
+export const socialLogin = asyncHandler(async (req, res, next) => {
+  const user = await userModel.findOne({email : req.data.email})
+  if(!user){
+    return next(new Error("user not found. please sign up first", {cause : 404}))
+  }
+  if(!user.googleId){
+    return next(new Error("please log in using email and password.", {cause : 405}))
+  }
+  const accessToken = await TKN.createToken(user._id, user.email, user.role, "1d");
+  const refreshToken = await TKN.createToken(user._id, user.email, user.role, "30d");
   res.status(200).json({ msg: "success", accessToken, refreshToken });
 });
 // ----------------REFRESH-TOKEN--------------------------
@@ -102,8 +125,13 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     {
       password: await HSH.hashData(newPassword),
       passChangedAt: Date.now(),
-      isFreezed : false,
+      isFreezed: false,
     }
   );
   res.status(200).json({ msg: "password changed successfully." });
 });
+// ----------------UPLOAD-AVATAR-----------------------------
+export const uploadAvatar = asyncHandler(async (req,res,next)=>{
+  await userModel.updateOne({email : req.user.email}, {avatar : req.file.path})
+  res.json({msg : 'success', path : req.file.path})
+})

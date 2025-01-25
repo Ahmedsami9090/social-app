@@ -54,3 +54,18 @@ export const resetPasswordSchema = {
     newPassword : Joi.string().min(6).required(),
   }).unknown(false)
 }
+export const socialSignupSchema = {
+  headers : Joi.object({
+    authentication : Joi.string().required()
+  }).unknown(true)
+}
+export const socialLoginSchema = {
+  headers : Joi.object({
+    authentication : Joi.string().required()
+  }).unknown(true)
+}
+export const uploadAvatarSchema = {
+  headers : Joi.object({
+    authentication : Joi.string().required()
+  }).unknown(true),
+}

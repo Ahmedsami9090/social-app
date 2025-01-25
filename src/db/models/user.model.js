@@ -28,11 +28,9 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
-      required: true,
     },
     role: {
       type: String,
@@ -63,6 +61,14 @@ const userSchema = new mongoose.Schema(
     },
     lastFailedOtpAttempt : {
       type : Date,
+    },
+    googleId : {
+      type : String,
+      default : null
+    },
+    avatar : {
+      type : String,
+      default : null
     }
   },
   {

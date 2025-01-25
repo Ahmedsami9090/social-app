@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as USER from "./users.service.js";
 import * as VD from "./users.validation.js";
-import { AU, validateInput, verifyMailOtp } from "../../middleware/index.js";
+import { AU, fileTypes, multerLocal, validateInput, verifyGoogleToken, verifyMailOtp } from "../../middleware/index.js";
 const userRouter = Router();
 userRouter.post(
   "/signup",
@@ -31,5 +31,24 @@ userRouter.post(
     validateInput(VD.resetPasswordSchema, ['body']),
     verifyMailOtp,
     USER.resetPassword
+)
+userRouter.post(
+  '/social-signup',
+  validateInput(VD.socialSignupSchema,['headers']), 
+  verifyGoogleToken, 
+  USER.socialSignup
+)
+userRouter.post(
+  '/social-login',
+  validateInput(VD.socialLoginSchema, ['headers']),
+  verifyGoogleToken,
+  USER.socialLogin
+)
+userRouter.post(
+  '/upload-avatar',
+  validateInput(VD.uploadAvatarSchema, ['headers']),
+  AU.authenticateUser,
+  multerLocal(fileTypes.image, 'avatars').single('avatar'),
+  USER.uploadAvatar
 )
 export default userRouter;
