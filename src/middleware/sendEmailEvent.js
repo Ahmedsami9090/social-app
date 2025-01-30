@@ -38,4 +38,23 @@ eventEmitter.on('sendOtp', async (receiver, expiryInMin = 2) => {
     return false;
   }
 })
+eventEmitter.on('sendRecentVisitors', async (receiver, receiverName, recentVisits)=>{
+
+  try {
+    await transporter.sendMail({
+      from: '"Social-app" <zaghloul85@gmail.com>', // sender address
+      to: receiver, // list of receivers
+      subject: "Recent Profile visits", // Subject line
+      text: "", // plain text body
+      html: `<div>
+      <p>${receiverName} has viewed your profile 5 times at these time periods:</p>
+       <ul>
+       ${recentVisits.map(visit=>`<li>${visit}</li>`)}
+       </ul>
+       </div>`
+    })
+  } catch (error) {
+    console.log(error);
+  }
+})
 

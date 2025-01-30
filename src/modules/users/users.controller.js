@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as USER from "./users.service.js";
 import * as VD from "./users.validation.js";
-import { AU, fileTypes, multerLocal, validateInput, verifyGoogleToken, verifyMailOtp } from "../../middleware/index.js";
+import { AU, fileTypes, multerLocal,multerServer, validateInput, verifyGoogleToken, verifyMailOtp } from "../../middleware/index.js";
 const userRouter = Router();
 userRouter.post(
   "/signup",
@@ -48,7 +48,38 @@ userRouter.post(
   '/upload-avatar',
   validateInput(VD.uploadAvatarSchema, ['headers']),
   AU.authenticateUser,
-  multerLocal(fileTypes.image, 'avatars').single('avatar'),
+  // multerLocal(fileTypes.image, 'avatars').single('avatar'),
+  multerServer(fileTypes.image).single('avatar'),
   USER.uploadAvatar
+)
+userRouter.get(
+  '/view-profile',
+  validateInput(VD.viewProfileSchema,['headers', 'query']),
+  AU.authenticateUser,
+  USER.viewProfile
+)
+userRouter.get(
+  '/request-2-step',
+  validateInput(VD.request2stepVerificationSchema, ['headers']),
+  AU.authenticateUser,
+  USER.request2StepVerification
+)
+userRouter.post(
+  '/enable-2-step',
+  validateInput(VD.enable2stepVerificationSchema, ['body']),
+  verifyMailOtp,
+  USER.enable2StepVerification
+)
+userRouter.post(
+  '/2-step-login',
+  validateInput(VD._2stepLoginSchema, ['body']),
+  verifyMailOtp,
+  USER._2stepLogin
+)
+userRouter.put(
+  '/block-user',
+  validateInput(VD.blockUserSchema, ['headers', 'body']),
+  AU.authenticateUser,
+  USER.blockUser
 )
 export default userRouter;

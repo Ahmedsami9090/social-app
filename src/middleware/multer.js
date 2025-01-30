@@ -8,7 +8,7 @@ export const fileTypes = {
     pdf : ['application/pdf'],
     audio : ['audio/mp3', 'audio/aac', 'audio/ogg', 'audio/wav']
 }
-const multerLocal = (validTypes = [], path = "generals") => {
+export const multerLocal = (validTypes = [], path = "generals") => {
     const uploadPath = `uploads/${path}`
     if(!fs.existsSync(uploadPath)){
         fs.mkdirSync(uploadPath, {recursive : true})
@@ -32,4 +32,17 @@ const multerLocal = (validTypes = [], path = "generals") => {
   const upload = multer({ storage, fileFilter });
   return upload
 };
-export default multerLocal
+
+export const multerServer = (validTypes = [])=>{
+  const storage = multer.diskStorage({});
+  
+  const fileFilter =  (req, file, cb) => {
+    if(validTypes.includes(file.mimetype)){
+        cb(null, true)
+    }else{
+        cb(new Error('invalid file type.'), false)
+    }
+  }
+  const upload = multer({ storage, fileFilter });
+  return upload
+}

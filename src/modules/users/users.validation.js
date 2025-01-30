@@ -18,54 +18,93 @@ export const signupSchema = {
   }).unknown(false),
 };
 export const confirmEmailSchema = {
-  body : Joi.object({
-    otp : Joi.number().min(0).max(9999).required(),
-    email : Joi.string()
-    .email({ tlds: ["com", "org"], minDomainSegments: 2 })
-    .required(),
-  }).unknown(false)
-}
+  body: Joi.object({
+    otp: Joi.number().min(0).max(9999).required(),
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+  }).unknown(false),
+};
 export const loginSchema = {
-  body : Joi.object({
-    email : Joi.string()
-    .email({ tlds: ["com", "org"], minDomainSegments: 2 })
-    .required(),
-    password : Joi.string().min(6).required(),
-  }).unknown(false)
-}
+  body: Joi.object({
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+    password: Joi.string().min(6).required(),
+  }).unknown(false),
+};
 export const refreshTokenSchema = {
-  headers : Joi.object({
-    authentication : Joi.string().required()
-  }).unknown(true)
-}
-export const forgetPasswordSchema = {
-  body : Joi.object({
-    email : Joi.string()
-    .email({ tlds: ["com", "org"], minDomainSegments: 2 })
-    .required(),
-  }).unknown(false)
-}
-export const resetPasswordSchema = {
-  body : Joi.object({
-    email : Joi.string()
-    .email({ tlds: ["com", "org"], minDomainSegments: 2 })
-    .required(),
-    otp : Joi.number().min(0).max(9999).required(),
-    newPassword : Joi.string().min(6).required(),
-  }).unknown(false)
-}
-export const socialSignupSchema = {
-  headers : Joi.object({
-    authentication : Joi.string().required()
-  }).unknown(true)
-}
-export const socialLoginSchema = {
-  headers : Joi.object({
-    authentication : Joi.string().required()
-  }).unknown(true)
-}
-export const uploadAvatarSchema = {
-  headers : Joi.object({
-    authentication : Joi.string().required()
+  headers: Joi.object({
+    authentication: Joi.string().required(),
   }).unknown(true),
-}
+};
+export const forgetPasswordSchema = {
+  body: Joi.object({
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+  }).unknown(false),
+};
+export const resetPasswordSchema = {
+  body: Joi.object({
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+    otp: Joi.number().min(0).max(9999).required(),
+    newPassword: Joi.string().min(6).required(),
+  }).unknown(false),
+};
+export const socialSignupSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+};
+export const socialLoginSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+};
+export const uploadAvatarSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+};
+export const viewProfileSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+  query: Joi.object({
+    id: Joi.string().required(),
+  }).unknown(false),
+};
+export const request2stepVerificationSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+};
+export const enable2stepVerificationSchema = {
+  body: Joi.object({
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+    otp: Joi.number().min(0).max(9999).required(),
+  }).unknown(false),
+};
+export const _2stepLoginSchema = {
+  body: Joi.object({
+    email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+    otp: Joi.number().min(0).max(9999).required(),
+  }).unknown(false),
+};
+export const blockUserSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+  body: Joi.object({
+    blocked_email: Joi.string()
+      .email({ tlds: ["com", "org"], minDomainSegments: 2 })
+      .required(),
+  }).unknown(false),
+};

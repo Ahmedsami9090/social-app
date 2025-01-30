@@ -7,8 +7,8 @@ const verifyMailOtp = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("email not found", { cause: 404 }));
   }
-  if (user.confirmed && !user.otpMail) {
-    return next(new Error(`email already confirmed or no OTP created.`, { cause: 409 }));
+  if (!user.otpMail) {
+    return next(new Error(`no OTP created.`, { cause: 409 }));
   }
   if (user.otpExpiry?.getTime() <= Date.now()) {
     await userModel.updateOne(

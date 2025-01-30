@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export const roleEnum = {
   admin : "admin",
@@ -67,8 +67,22 @@ const userSchema = new mongoose.Schema(
       default : null
     },
     avatar : {
-      type : String,
-      default : null
+      url : String,
+      public_id : String
+    },
+    profileVisits : [
+      {
+        user_id : mongoose.Types.ObjectId,
+        recentVisits : [Date],
+        oldVisits : [Date]
+      }
+    ],
+    twoStepEnabled : {
+      type : Boolean,
+      default : false
+    },
+    blockedUsers : {
+      type : [String],
     }
   },
   {
