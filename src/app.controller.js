@@ -1,4 +1,5 @@
 import connection from "./db/connectionDb.js";
+import commentRouter from "./modules/comments/comments.controller.js";
 import postsRouter from "./modules/posts/posts.controller.js";
 import userRouter from "./modules/users/users.controller.js";
 import cors from "cors";
@@ -11,6 +12,7 @@ const bootstrap = async (app, express) => {
   });
   app.use("/users", userRouter);
   app.use("/posts", postsRouter);
+  app.use('/comments', commentRouter)
   app.use("*", (req, res, next) => {
     next(new Error("invalid url", { cause: 404 }));
   });

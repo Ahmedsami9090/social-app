@@ -48,7 +48,6 @@ userRouter.post(
   '/upload-avatar',
   validateInput(VD.uploadAvatarSchema, ['headers']),
   AU.authenticateUser,
-  // multerLocal(fileTypes.image, 'avatars').single('avatar'),
   multerServer(fileTypes.image).single('avatar'),
   USER.uploadAvatar
 )
@@ -81,5 +80,11 @@ userRouter.put(
   validateInput(VD.blockUserSchema, ['headers', 'body']),
   AU.authenticateUser,
   USER.blockUser
+)
+userRouter.post(
+  '/friends',
+  validateInput(VD.addFriendsSchema, ['headers', 'body']),
+  AU.authenticateUser,
+  USER.addFriend
 )
 export default userRouter;

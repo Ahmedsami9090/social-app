@@ -1,6 +1,6 @@
 const validateInput = (schema, locations) => {
   return (req, res, next) => {
-    let errorBox = [];
+    let errorBox = [];    
     for (const location of locations) {
       if (schema[location]) {
         const { error } = schema[location].validate(req[location], {

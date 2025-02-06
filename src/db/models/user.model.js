@@ -1,19 +1,19 @@
 import mongoose, { Types } from "mongoose";
 
 export const roleEnum = {
-  admin : "admin",
-  user : "user"
-}
+  admin: "admin",
+  user: "user",
+};
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
-      set : (value)=> {
+      set: (value) => {
         return value
           .split(" ")
-          .filter((word)=> word)
+          .filter((word) => word)
           .map(
             (item) => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()
           )
@@ -37,52 +37,56 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(roleEnum),
       default: roleEnum.user,
     },
-    confirmed : {
-      type : Boolean,
-      default: false
+    confirmed: {
+      type: Boolean,
+      default: false,
     },
-    passChangedAt : {
-      type : Date,
-      default : null
+    passChangedAt: {
+      type: Date,
+      default: null,
     },
-    isFreezed : {
-      type : Boolean,
-      default : false
+    isFreezed: {
+      type: Boolean,
+      default: false,
     },
-    otpMail : {
-      type : String,
+    otpMail: {
+      type: String,
     },
-    otpExpiry : {
-      type : Date
+    otpExpiry: {
+      type: Date,
     },
-    failedAttempts : {
-      type : Number,
-      default : 0,
+    failedAttempts: {
+      type: Number,
+      default: 0,
     },
-    lastFailedOtpAttempt : {
-      type : Date,
+    lastFailedOtpAttempt: {
+      type: Date,
     },
-    googleId : {
-      type : String,
-      default : null
+    googleId: {
+      type: String,
+      default: null,
     },
-    avatar : {
-      url : String,
-      public_id : String
+    avatar: {
+      url: String,
+      public_id: String,
     },
-    profileVisits : [
+    profileVisits: [
       {
-        user_id : mongoose.Types.ObjectId,
-        recentVisits : [Date],
-        oldVisits : [Date]
-      }
+        user_id: mongoose.Types.ObjectId,
+        recentVisits: [Date],
+        oldVisits: [Date],
+      },
     ],
-    twoStepEnabled : {
-      type : Boolean,
-      default : false
+    twoStepEnabled: {
+      type: Boolean,
+      default: false,
     },
-    blockedUsers : {
-      type : [String],
+    blockedUsers: {
+      type: [String],
+    },
+    friends : {
+      type : [mongoose.Types.ObjectId],
+      ref : 'User'
     }
   },
   {

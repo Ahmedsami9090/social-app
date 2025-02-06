@@ -108,3 +108,11 @@ export const blockUserSchema = {
       .required(),
   }).unknown(false),
 };
+export const addFriendsSchema = {
+  headers: Joi.object({
+    authentication: Joi.string().required(),
+  }).unknown(true),
+  body : Joi.object({
+    userId : Joi.string().required()
+  }).unknown(false)
+}

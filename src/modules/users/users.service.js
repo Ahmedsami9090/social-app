@@ -1,6 +1,6 @@
 import { asyncHandler, TKN } from "../../utils/index.js";
 import userModel from "./../../db/models/user.model.js";
-import { HSH, EN, serverUpload } from "../../utils/index.js";
+import { HSH, EN, uploadFiles } from "../../utils/index.js";
 import { eventEmitter } from "./../../middleware/index.js";
 import mongoose from "mongoose";
 // ------------------SIGNUP--------------------------
@@ -159,12 +159,12 @@ export const uploadAvatar = asyncHandler(async (req, res, next) => {
   if (!req.file) {
     return next(new Error("please upload avatar", { cause: 401 }));
   }
-  const { url, public_id } = await serverUpload(req.file.path, "avatars");
+  const data = await uploadFiles([req.file], "avatars");
   await userModel.updateOne(
     { email: req.user.email },
-    { avatar: { public_id, url } }
+    { avatar: { public_id: data[0].public_id, url: data[0].url } }
   );
-  res.json({ msg: "success", data: { public_id, url } });
+  res.json({ msg: "success", data: data[0] });
 });
 // --------------VIEW-PROFILE------------------------------
 export const viewProfile = asyncHandler(async (req, res, next) => {
@@ -295,3 +295,21 @@ export const blockUser = asyncHandler(async (req, res, next) => {
   );
   res.status(200).json({ msg: `${blocked_email} is blocked successfully.` });
 });
+//-------------------ADD-FRIEND-&-UNFRIEND------------------------
+export const addFriend = asyncHandler(async (req,res,next)=>{
+  const {userId} = req.body
+  if(req.user._id.equals(userId)){
+    return next(new Error("you can't add your ID to your friends", {cause : 409}))
+  }
+  let result = ''
+  if(!req.user.friends?.includes(userId) && !req.user.blockedUsers?.includes(userId)){
+    result = await userModel.findByIdAndUpdate(req.user._id, {
+      $push : {friends : userId}
+    }, {new:  true})
+  }else {
+    result = await userModel.findByIdAndUpdate(req.user._id, {
+      $pull : {friends : userId}
+    }, {new:  true})
+  }
+  res.status(201).json({msg : 'success', user : {name : result.name, email : result.email, friends : result.friends}})
+})
